@@ -163,7 +163,6 @@ const Portfolio = () => {
           </div>
         </div>
       )}
-
       <main>
         {/* Hero Section */}
         <section id="home" className="min-h-screen flex items-center justify-center pt-16 relative overflow-hidden">
