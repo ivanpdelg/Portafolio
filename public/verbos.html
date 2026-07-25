@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>500 Verbos — Cuaderno de práctica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#f6f1e6;
+    --paper-line:#e3dac4;
+    --ink:#1c2b3a;
+    --ink-soft:#4a5a6a;
+    --rule:#c9bfa0;
+    --basico:#3f7a68;
+    --facil:#3a6ea5;
+    --dificil:#c1662f;
+    --epico:#7a2048;
+    --epico-gold:#c99a3a;
+    --correct:#2f7d54;
+    --wrong:#b23a2e;
+    --card-shadow: 0 1px 0 rgba(28,43,58,.05), 0 8px 24px rgba(28,43,58,.08);
+    --card-bg:#fffdf8;
+    color-scheme: light;
+  }
+  html[data-theme="dark"]{
+    --paper:#161b24;
+    --paper-line:#232a37;
+    --ink:#eef1f6;
+    --ink-soft:#9aa6b8;
+    --rule:#39435a;
+    --basico:#57b399;
+    --facil:#6ba2e0;
+    --dificil:#e08a52;
+    --epico:#d16d94;
+    --epico-gold:#e0b862;
+    --correct:#5fce9a;
+    --wrong:#f0837a;
+    --card-shadow: 0 1px 0 rgba(0,0,0,.2), 0 8px 28px rgba(0,0,0,.45);
+    --card-bg:#1c222e;
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      repeating-linear-gradient(
+        to bottom,
+        transparent 0px, transparent 33px, var(--paper-line) 34px
+      ),
+      var(--paper);
+    font-family:'Inter', sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    padding: 28px 16px 60px;
+    transition: background-color .25s ease, color .25s ease;
+  }
+  .wrap{max-width:880px;margin:0 auto;}
+
+  header.top{
+    display:flex; align-items:baseline; justify-content:space-between; gap:16px;
+    flex-wrap:wrap;
+    margin-bottom:22px;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom:14px;
+  }
+  header.top h1{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:clamp(1.5rem, 2.6vw, 2.1rem);
+    margin:0;
+    letter-spacing:-0.01em;
+  }
+  header.top .kicker{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.72rem;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+  .score-badge{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.82rem;
+    background:var(--ink);
+    color:var(--paper);
+    padding:6px 12px;
+    border-radius:3px;
+    white-space:nowrap;
+  }
+  .score-badge b{color:var(--epico-gold);}
+
+  .header-right{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  .theme-toggle{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.78rem;
+    display:flex; align-items:center; gap:7px;
+    background:transparent;
+    border:2px solid var(--ink);
+    color:var(--ink);
+    padding:6px 12px;
+    border-radius:20px;
+    cursor:pointer;
+  }
+  .theme-toggle:hover{background:rgba(128,128,128,.12);}
+  .theme-toggle .icon{font-size:.95rem; line-height:1;}
+
+  nav.tabs{
+    display:flex; gap:6px; margin-bottom:22px; flex-wrap:wrap;
+  }
+  nav.tabs button{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:.92rem;
+    background:transparent;
+    border:2px solid var(--ink);
+    border-bottom:none;
+    color:var(--ink);
+    padding:9px 16px 8px;
+    border-radius:8px 8px 0 0;
+    cursor:pointer;
+    position:relative;
+    top:2px;
+  }
+  nav.tabs button.active{
+    background:var(--ink);
+    color:var(--paper);
+  }
+  nav.tabs button:hover:not(.active){
+    background:rgba(28,43,58,.08);
+  }
+
+  .panel{
+    display:none;
+    background:var(--card-bg);
+    border:2px solid var(--ink);
+    border-radius:4px;
+    box-shadow:var(--card-shadow);
+    padding:26px 26px 22px;
+    position:relative;
+  }
+  .panel.active{display:block;}
+
+  .stamp{
+    position:absolute;
+    top:-14px; right:22px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.68rem;
+    letter-spacing:.1em;
+    text-transform:uppercase;
+    padding:5px 10px;
+    border-radius:20px;
+    border:2px solid currentColor;
+    background:var(--card-bg);
+    transform:rotate(3deg);
+  }
+  .stamp.mode-en2es{color:var(--facil);}
+  .stamp.mode-es2en{color:var(--basico);}
+  .stamp.mode-mix{color:var(--dificil);}
+
+  .prompt-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.72rem;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:6px;
+  }
+  .prompt-word{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:clamp(1.6rem,4vw,2.4rem);
+    line-height:1.15;
+    margin:2px 0 4px;
+  }
+  .prompt-sub{
+    font-family:'IBM Plex Mono', monospace;
+    color:var(--ink-soft);
+    font-size:.95rem;
+    margin-bottom:18px;
+  }
+
+  .answer-row{
+    display:flex; gap:10px; flex-wrap:wrap; margin-top:6px;
+  }
+  input[type=text]{
+    flex:1 1 220px;
+    font-family:'Inter', sans-serif;
+    font-size:1.05rem;
+    padding:12px 14px;
+    border:2px solid var(--rule);
+    border-radius:6px;
+    background:#fff;
+    color:var(--ink);
+    outline:none;
+  }
+  input[type=text]:focus{border-color:var(--ink);}
+  .btn{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:1rem;
+    border:2px solid var(--ink);
+    background:var(--ink);
+    color:var(--paper);
+    padding:11px 20px;
+    border-radius:6px;
+    cursor:pointer;
+  }
+  .btn:hover{opacity:.88;}
+  .btn.secondary{
+    background:transparent;
+    color:var(--ink);
+  }
+  .btn:focus-visible, button:focus-visible, input:focus-visible{
+    outline:3px solid var(--epico-gold);
+    outline-offset:2px;
+  }
+
+  .feedback{
+    margin-top:16px;
+    padding:12px 14px;
+    border-radius:6px;
+    font-size:.98rem;
+    display:none;
+    align-items:center;
+    gap:8px;
+  }
+  .feedback.show{display:flex;}
+  .feedback.correct{background:rgba(47,125,84,.1); color:var(--correct); border:1.5px solid var(--correct);}
+  .feedback.wrong{background:rgba(178,58,46,.1); color:var(--wrong); border:1.5px solid var(--wrong);}
+  .feedback b{font-weight:700;}
+
+  .next-row{margin-top:16px; display:flex; justify-content:flex-end;}
+
+  /* Sentence completion */
+  .diff-row{
+    display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px;
+  }
+  .diff-btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.78rem;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    padding:8px 14px;
+    border-radius:20px;
+    border:2px solid var(--ink);
+    background:transparent;
+    color:var(--ink);
+    cursor:pointer;
+  }
+  .diff-btn[data-diff="basico"].active{background:var(--basico); border-color:var(--basico); color:#fff;}
+  .diff-btn[data-diff="facil"].active{background:var(--facil); border-color:var(--facil); color:#fff;}
+  .diff-btn[data-diff="dificil"].active{background:var(--dificil); border-color:var(--dificil); color:#fff;}
+  .diff-btn[data-diff="epico"].active{background:var(--epico); border-color:var(--epico-gold); color:#fff;}
+
+  .sentence-box{
+    font-family:'Fraunces', serif;
+    font-size:clamp(1.15rem,2.6vw,1.5rem);
+    line-height:1.55;
+    margin-bottom:8px;
+  }
+  .blank-visual{
+    display:inline-block;
+    min-width:90px;
+    border-bottom:2.5px solid var(--ink);
+    text-align:center;
+  }
+  .hint-line{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.8rem;
+    color:var(--ink-soft);
+    margin-bottom:16px;
+  }
+
+  footer.note{
+    margin-top:26px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:.74rem;
+    color:var(--ink-soft);
+    line-height:1.6;
+  }
+
+  @media (prefers-reduced-motion: no-preference){
+    .panel.active{animation:fadein .25s ease;}
+    @keyframes fadein{from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:none;}}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <div class="kicker">Cuaderno de práctica · 500 verbos</div>
+      <h1>Verbos en Inglés</h1>
+    </div>
+    <div class="header-right">
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">
+        <span class="icon" id="themeIcon">🌙</span>
+        <span id="themeLabel">Modo oscuro</span>
+      </button>
+      <div class="score-badge">Aciertos: <b id="scoreCorrect">0</b> / <span id="scoreTotal">0</span></div>
+    </div>
+  </header>
+
+  <nav class="tabs">
+    <button data-panel="en2es" class="active">Inglés → Español</button>
+    <button data-panel="es2en">Español → Inglés</button>
+    <button data-panel="mix">Aleatorio</button>
+    <button data-panel="sentences">Completar oraciones</button>
+  </nav>
+
+  <!-- EN -> ES -->
+  <section class="panel active" id="panel-en2es">
+    <div class="stamp mode-en2es">Modo · Traducir al español</div>
+    <div class="prompt-label">¿Qué significa...?</div>
+    <div class="prompt-word" id="en2es-word">—</div>
+    <div class="prompt-sub" id="en2es-pron"></div>
+    <div class="answer-row">
+      <input type="text" id="en2es-input" placeholder="Escribe el significado en español" autocomplete="off">
+      <button class="btn" id="en2es-check">Comprobar</button>
+    </div>
+    <div class="feedback" id="en2es-feedback"></div>
+    <div class="next-row"><button class="btn secondary" id="en2es-next">Siguiente verbo →</button></div>
+  </section>
+
+  <!-- ES -> EN -->
+  <section class="panel" id="panel-es2en">
+    <div class="stamp mode-es2en">Modo · Traducir al inglés</div>
+    <div class="prompt-label">¿Cómo se dice...?</div>
+    <div class="prompt-word" id="es2en-word">—</div>
+    <div class="prompt-sub">&nbsp;</div>
+    <div class="answer-row">
+      <input type="text" id="es2en-input" placeholder="Write the verb in English" autocomplete="off">
+      <button class="btn" id="es2en-check">Comprobar</button>
+    </div>
+    <div class="feedback" id="es2en-feedback"></div>
+    <div class="next-row"><button class="btn secondary" id="es2en-next">Siguiente verbo →</button></div>
+  </section>
+
+  <!-- MIX -->
+  <section class="panel" id="panel-mix">
+    <div class="stamp mode-mix">Modo · Mezcla al azar</div>
+    <div class="prompt-label" id="mix-label">¿Qué significa...?</div>
+    <div class="prompt-word" id="mix-word">—</div>
+    <div class="prompt-sub" id="mix-pron"></div>
+    <div class="answer-row">
+      <input type="text" id="mix-input" placeholder="Escribe tu respuesta" autocomplete="off">
+      <button class="btn" id="mix-check">Comprobar</button>
+    </div>
+    <div class="feedback" id="mix-feedback"></div>
+    <div class="next-row"><button class="btn secondary" id="mix-next">Siguiente →</button></div>
+  </section>
+
+  <!-- SENTENCES -->
+  <section class="panel" id="panel-sentences">
+    <div class="stamp" style="color:var(--epico)">Modo · Oraciones</div>
+    <div class="prompt-label">Elige la dificultad</div>
+    <div class="diff-row">
+      <button class="diff-btn active" data-diff="basico">Básico</button>
+      <button class="diff-btn" data-diff="facil">Fácil</button>
+      <button class="diff-btn" data-diff="dificil">Difícil</button>
+      <button class="diff-btn" data-diff="epico">Épico</button>
+    </div>
+    <div class="prompt-label">Completa la oración con el verbo correcto</div>
+    <div class="sentence-box" id="sentence-box">—</div>
+    <div class="hint-line" id="sentence-hint"></div>
+    <div class="answer-row">
+      <input type="text" id="sentence-input" placeholder="Escribe el verbo que falta" autocomplete="off">
+      <button class="btn" id="sentence-check">Comprobar</button>
+    </div>
+    <div class="feedback" id="sentence-feedback"></div>
+    <div class="next-row"><button class="btn secondary" id="sentence-next">Nueva oración →</button></div>
+  </section>
+
+  <footer class="note">
+    500 verbos en inglés con su traducción al español. Las oraciones para completar se generan al azar
+    combinando plantillas, sujetos, tiempos y conectores — hay miles de combinaciones posibles,
+    así que difícilmente verás la misma dos veces.
+  </footer>
+</div>
+
+<script id="verbs-data" type="application/json">[{"en": "accept", "past": "accepted", "es": "aceptar", "enPron": "aksept", "pastPron": "akseptid"}, {"en": "achieve", "past": "achieved", "es": "lograr", "enPron": "achiiv", "pastPron": "achiivd"}, {"en": "act", "past": "acted", "es": "actuar", "enPron": "akt", "pastPron": "aktid"}, {"en": "add", "past": "added", "es": "agregar", "enPron": "ad", "pastPron": "adid"}, {"en": "advise", "past": "advised", "es": "aconsejar", "enPron": "advaiz", "pastPron": "advaizd"}, {"en": "afford", "past": "afforded", "es": "permitirse (costo)", "enPron": "aford", "pastPron": "afordid"}, {"en": "agree", "past": "agreed", "es": "estar de acuerdo", "enPron": "agrii", "pastPron": "agriid"}, {"en": "aim", "past": "aimed", "es": "apuntar", "enPron": "eim", "pastPron": "eimd"}, {"en": "allow", "past": "allowed", "es": "permitir", "enPron": "alau", "pastPron": "alaud"}, {"en": "amaze", "past": "amazed", "es": "asombrar", "enPron": "ameiz", "pastPron": "ameizd"}, {"en": "amuse", "past": "amused", "es": "divertir", "enPron": "amiuz", "pastPron": "amiuzd"}, {"en": "analyze", "past": "analyzed", "es": "analizar", "enPron": "analaiz", "pastPron": "analaizd"}, {"en": "announce", "past": "announced", "es": "anunciar", "enPron": "anauns", "pastPron": "anaunst"}, {"en": "annoy", "past": "annoyed", "es": "molestar", "enPron": "anoi", "pastPron": "anoid"}, {"en": "answer", "past": "answered", "es": "responder", "enPron": "anser", "pastPron": "anserd"}, {"en": "apologize", "past": "apologized", "es": "disculparse", "enPron": "apoloyaiz", "pastPron": "apoloyaizd"}, {"en": "appear", "past": "appeared", "es": "aparecer", "enPron": "apir", "pastPron": "apird"}, {"en": "apply", "past": "applied", "es": "aplicar / postular", "enPron": "aplai", "pastPron": "aplaid"}, {"en": "approach", "past": "approached", "es": "acercarse", "enPron": "aprouch", "pastPron": "aproucht"}, {"en": "approve", "past": "approved", "es": "aprobar", "enPron": "apruv", "pastPron": "apruvd"}, {"en": "argue", "past": "argued", "es": "discutir / argumentar", "enPron": "argiu", "pastPron": "argiud"}, {"en": "arm", "past": "armed", "es": "armar", "enPron": "arm", "pastPron": "armd"}, {"en": "arrange", "past": "arranged", "es": "organizar", "enPron": "areinch", "pastPron": "areincht"}, {"en": "arrive", "past": "arrived", "es": "llegar", "enPron": "araiv", "pastPron": "araivd"}, {"en": "ask", "past": "asked", "es": "preguntar", "enPron": "ask", "pastPron": "askt"}, {"en": "assist", "past": "assisted", "es": "asistir / ayudar", "enPron": "asist", "pastPron": "asistid"}, {"en": "assume", "past": "assumed", "es": "suponer", "enPron": "asium", "pastPron": "asiumd"}, {"en": "assure", "past": "assured", "es": "asegurar", "enPron": "ashur", "pastPron": "ashurd"}, {"en": "attack", "past": "attacked", "es": "atacar", "enPron": "atak", "pastPron": "atakt"}, {"en": "attend", "past": "attended", "es": "asistir", "enPron": "atend", "pastPron": "atendid"}, {"en": "avoid", "past": "avoided", "es": "evitar", "enPron": "avoid", "pastPron": "avoidid"}, {"en": "bake", "past": "baked", "es": "hornear", "enPron": "beik", "pastPron": "beikt"}, {"en": "balance", "past": "balanced", "es": "equilibrar", "enPron": "balans", "pastPron": "balanst"}, {"en": "ban", "past": "banned", "es": "prohibir", "enPron": "ban", "pastPron": "band"}, {"en": "base", "past": "based", "es": "basar", "enPron": "beis", "pastPron": "beist"}, {"en": "be", "past": "was/were", "es": "ser / estar", "enPron": "bi", "pastPron": "uas/uer"}, {"en": "bear", "past": "bore", "es": "soportar / dar a luz", "enPron": "beer", "pastPron": "bor"}, {"en": "beat", "past": "beat", "es": "golpear / vencer", "enPron": "biit", "pastPron": "biit"}, {"en": "become", "past": "became", "es": "convertirse", "enPron": "bikam", "pastPron": "bikeim"}, {"en": "beg", "past": "begged", "es": "rogar", "enPron": "beg", "pastPron": "begd"}, {"en": "begin", "past": "began", "es": "empezar", "enPron": "biguin", "pastPron": "bigan"}, {"en": "behave", "past": "behaved", "es": "comportarse", "enPron": "biheiv", "pastPron": "biheivd"}, {"en": "believe", "past": "believed", "es": "creer", "enPron": "biliiv", "pastPron": "biliivd"}, {"en": "belong", "past": "belonged", "es": "pertenecer", "enPron": "bilong", "pastPron": "bilongd"}, {"en": "bend", "past": "bent", "es": "doblar", "enPron": "bend", "pastPron": "bent"}, {"en": "bet", "past": "bet", "es": "apostar", "enPron": "bet", "pastPron": "bet"}, {"en": "bind", "past": "bound", "es": "atar / unir", "enPron": "baind", "pastPron": "baund"}, {"en": "bite", "past": "bit", "es": "morder", "enPron": "bait", "pastPron": "bit"}, {"en": "blame", "past": "blamed", "es": "culpar", "enPron": "bleim", "pastPron": "bleimd"}, {"en": "bleed", "past": "bled", "es": "sangrar", "enPron": "bliid", "pastPron": "bled"}, {"en": "bless", "past": "blessed", "es": "bendecir", "enPron": "bles", "pastPron": "blest"}, {"en": "blind", "past": "blinded", "es": "cegar", "enPron": "blaind", "pastPron": "blaindid"}, {"en": "block", "past": "blocked", "es": "bloquear", "enPron": "blok", "pastPron": "blokt"}, {"en": "blow", "past": "blew", "es": "soplar", "enPron": "blou", "pastPron": "blu"}, {"en": "boast", "past": "boasted", "es": "presumir", "enPron": "boust", "pastPron": "boustid"}, {"en": "boil", "past": "boiled", "es": "hervir", "enPron": "boil", "pastPron": "boild"}, {"en": "bomb", "past": "bombed", "es": "bombardear", "enPron": "bom", "pastPron": "bomd"}, {"en": "book", "past": "booked", "es": "reservar", "enPron": "buk", "pastPron": "bukt"}, {"en": "bore", "past": "bored", "es": "aburrir", "enPron": "bor", "pastPron": "bord"}, {"en": "borrow", "past": "borrowed", "es": "pedir prestado", "enPron": "borou", "pastPron": "boroud"}, {"en": "bounce", "past": "bounced", "es": "rebotar", "enPron": "bauns", "pastPron": "baunst"}, {"en": "bow", "past": "bowed", "es": "inclinarse", "enPron": "bau", "pastPron": "baud"}, {"en": "brake", "past": "braked", "es": "frenar", "enPron": "breik", "pastPron": "breikt"}, {"en": "branch", "past": "branched", "es": "ramificarse", "enPron": "branch", "pastPron": "brancht"}, {"en": "break", "past": "broke", "es": "romper", "enPron": "breik", "pastPron": "brouk"}, {"en": "bring", "past": "brought", "es": "traer", "enPron": "bring", "pastPron": "brot"}, {"en": "brush", "past": "brushed", "es": "cepillar", "enPron": "brash", "pastPron": "brasht"}, {"en": "build", "past": "built", "es": "construir", "enPron": "bild", "pastPron": "bilt"}, {"en": "bump", "past": "bumped", "es": "chocar", "enPron": "bamp", "pastPron": "bampt"}, {"en": "burn", "past": "burned/burnt", "es": "quemar", "enPron": "bern", "pastPron": "bernd/bernd"}, {"en": "burst", "past": "burst", "es": "reventar", "enPron": "berst", "pastPron": "berst"}, {"en": "bury", "past": "buried", "es": "enterrar", "enPron": "beri", "pastPron": "berid"}, {"en": "button", "past": "buttoned", "es": "abotonar", "enPron": "baton", "pastPron": "batond"}, {"en": "buy", "past": "bought", "es": "comprar", "enPron": "bai", "pastPron": "bot"}, {"en": "calculate", "past": "calculated", "es": "calcular", "enPron": "kalkiuleit", "pastPron": "kalkiuleitid"}, {"en": "call", "past": "called", "es": "llamar", "enPron": "col", "pastPron": "cold"}, {"en": "cancel", "past": "canceled", "es": "cancelar", "enPron": "kansel", "pastPron": "kanseld"}, {"en": "carry", "past": "carried", "es": "cargar / llevar", "enPron": "kari", "pastPron": "karid"}, {"en": "catch", "past": "caught", "es": "atrapar", "enPron": "kach", "pastPron": "kot"}, {"en": "celebrate", "past": "celebrated", "es": "celebrar", "enPron": "selebreit", "pastPron": "selebreitid"}, {"en": "challenge", "past": "challenged", "es": "desafiar", "enPron": "chalench", "pastPron": "chalencht"}, {"en": "change", "past": "changed", "es": "cambiar", "enPron": "cheinch", "pastPron": "cheincht"}, {"en": "chase", "past": "chased", "es": "perseguir", "enPron": "cheis", "pastPron": "cheist"}, {"en": "chat", "past": "chatted", "es": "charlar", "enPron": "chat", "pastPron": "chatid"}, {"en": "cheat", "past": "cheated", "es": "engañar / hacer trampa", "enPron": "chiit", "pastPron": "chiitid"}, {"en": "check", "past": "checked", "es": "revisar", "enPron": "chek", "pastPron": "chekt"}, {"en": "cheer", "past": "cheered", "es": "animar", "enPron": "chir", "pastPron": "chird"}, {"en": "chew", "past": "chewed", "es": "masticar", "enPron": "chu", "pastPron": "chud"}, {"en": "choose", "past": "chose", "es": "elegir", "enPron": "chuz", "pastPron": "chouz"}, {"en": "chop", "past": "chopped", "es": "picar / cortar", "enPron": "chop", "pastPron": "chopt"}, {"en": "claim", "past": "claimed", "es": "reclamar / afirmar", "enPron": "kleim", "pastPron": "kleimd"}, {"en": "clap", "past": "clapped", "es": "aplaudir", "enPron": "klap", "pastPron": "klapt"}, {"en": "classify", "past": "classified", "es": "clasificar", "enPron": "klasifai", "pastPron": "klasifaid"}, {"en": "clean", "past": "cleaned", "es": "limpiar", "enPron": "kliin", "pastPron": "kliind"}, {"en": "click", "past": "clicked", "es": "hacer clic", "enPron": "klik", "pastPron": "klikt"}, {"en": "climb", "past": "climbed", "es": "escalar / subir", "enPron": "klaim", "pastPron": "klaimd"}, {"en": "cling", "past": "clung", "es": "aferrarse", "enPron": "kling", "pastPron": "klang"}, {"en": "clip", "past": "clipped", "es": "recortar", "enPron": "klip", "pastPron": "klipt"}, {"en": "close", "past": "closed", "es": "cerrar", "enPron": "klouz", "pastPron": "klouzd"}, {"en": "clutch", "past": "clutched", "es": "aferrar", "enPron": "klach", "pastPron": "klacht"}, {"en": "coach", "past": "coached", "es": "entrenar", "enPron": "kouch", "pastPron": "koucht"}, {"en": "coincide", "past": "coincided", "es": "coincidir", "enPron": "kouinsaid", "pastPron": "kouinsaidid"}, {"en": "collect", "past": "collected", "es": "recolectar", "enPron": "kolekt", "pastPron": "kolektid"}, {"en": "comb", "past": "combed", "es": "peinar", "enPron": "koum", "pastPron": "koumd"}, {"en": "combine", "past": "combined", "es": "combinar", "enPron": "kombain", "pastPron": "kombaind"}, {"en": "come", "past": "came", "es": "venir", "enPron": "kam", "pastPron": "keim"}, {"en": "command", "past": "commanded", "es": "ordenar (mandar)", "enPron": "komand", "pastPron": "komandid"}, {"en": "comment", "past": "commented", "es": "comentar", "enPron": "koment", "pastPron": "komentid"}, {"en": "commit", "past": "committed", "es": "cometer", "enPron": "komit", "pastPron": "komitid"}, {"en": "communicate", "past": "communicated", "es": "comunicar", "enPron": "komiunikeit", "pastPron": "komiunikeitid"}, {"en": "compare", "past": "compared", "es": "comparar", "enPron": "kompeer", "pastPron": "kompeerd"}, {"en": "compete", "past": "competed", "es": "competir", "enPron": "kompiit", "pastPron": "kompiitid"}, {"en": "complain", "past": "complained", "es": "quejarse", "enPron": "kompleein", "pastPron": "kompleeind"}, {"en": "complete", "past": "completed", "es": "completar", "enPron": "kompliit", "pastPron": "kompliitid"}, {"en": "complicate", "past": "complicated", "es": "complicar", "enPron": "komplikeit", "pastPron": "komplikeitid"}, {"en": "compose", "past": "composed", "es": "componer", "enPron": "kompouz", "pastPron": "kompouzd"}, {"en": "comprehend", "past": "comprehended", "es": "comprender", "enPron": "komprijend", "pastPron": "komprijendid"}, {"en": "concentrate", "past": "concentrated", "es": "concentrarse", "enPron": "konsentreit", "pastPron": "konsentreitid"}, {"en": "concern", "past": "concerned", "es": "concernir", "enPron": "konsern", "pastPron": "konsernd"}, {"en": "conclude", "past": "concluded", "es": "concluir", "enPron": "konkluud", "pastPron": "konkluudid"}, {"en": "conduct", "past": "conducted", "es": "conducir / llevar a cabo", "enPron": "kondakt", "pastPron": "kondaktid"}, {"en": "confess", "past": "confessed", "es": "confesar", "enPron": "konfes", "pastPron": "konfest"}, {"en": "confirm", "past": "confirmed", "es": "confirmar", "enPron": "konferm", "pastPron": "konfermd"}, {"en": "confront", "past": "confronted", "es": "confrontar", "enPron": "konfrant", "pastPron": "konfrantid"}, {"en": "confuse", "past": "confused", "es": "confundir", "enPron": "konfiuz", "pastPron": "konfiuzd"}, {"en": "connect", "past": "connected", "es": "conectar", "enPron": "konekt", "pastPron": "konektid"}, {"en": "conquer", "past": "conquered", "es": "conquistar", "enPron": "konker", "pastPron": "konkerd"}, {"en": "consider", "past": "considered", "es": "considerar", "enPron": "konsider", "pastPron": "konsiderd"}, {"en": "consist", "past": "consisted", "es": "consistir", "enPron": "konsist", "pastPron": "konsistid"}, {"en": "construct", "past": "constructed", "es": "construir", "enPron": "konstrakt", "pastPron": "konstraktid"}, {"en": "consult", "past": "consulted", "es": "consultar", "enPron": "konsalt", "pastPron": "konsaltid"}, {"en": "consume", "past": "consumed", "es": "consumir", "enPron": "konsium", "pastPron": "konsiumd"}, {"en": "contact", "past": "contacted", "es": "contactar", "enPron": "kontakt", "pastPron": "kontaktid"}, {"en": "contain", "past": "contained", "es": "contener", "enPron": "konteein", "pastPron": "konteeind"}, {"en": "continue", "past": "continued", "es": "continuar", "enPron": "continue", "pastPron": "continued"}, {"en": "contribute", "past": "contributed", "es": "contribuir", "enPron": "kontribiut", "pastPron": "kontribiutid"}, {"en": "control", "past": "controlled", "es": "controlar", "enPron": "kontroul", "pastPron": "kontrould"}, {"en": "convert", "past": "converted", "es": "convertir", "enPron": "konvert", "pastPron": "konvertid"}, {"en": "convince", "past": "convinced", "es": "convencer", "enPron": "konvins", "pastPron": "konvinst"}, {"en": "cook", "past": "cooked", "es": "cocinar", "enPron": "kuk", "pastPron": "kukt"}, {"en": "cope", "past": "coped", "es": "sobrellevar", "enPron": "koup", "pastPron": "koupt"}, {"en": "copy", "past": "copied", "es": "copiar", "enPron": "kopi", "pastPron": "kopid"}, {"en": "correct", "past": "corrected", "es": "corregir", "enPron": "korekt", "pastPron": "korektid"}, {"en": "correspond", "past": "corresponded", "es": "corresponder", "enPron": "korespond", "pastPron": "korespondid"}, {"en": "count", "past": "counted", "es": "contar", "enPron": "kaunt", "pastPron": "kauntid"}, {"en": "cover", "past": "covered", "es": "cubrir", "enPron": "kaver", "pastPron": "kaverd"}, {"en": "crack", "past": "cracked", "es": "agrietar", "enPron": "krak", "pastPron": "krakt"}, {"en": "crash", "past": "crashed", "es": "chocar", "enPron": "krash", "pastPron": "krasht"}, {"en": "crawl", "past": "crawled", "es": "gatear", "enPron": "krol", "pastPron": "krold"}, {"en": "create", "past": "created", "es": "crear", "enPron": "krieit", "pastPron": "krieitid"}, {"en": "creep", "past": "crept", "es": "arrastrarse", "enPron": "kriip", "pastPron": "krept"}, {"en": "criticize", "past": "criticized", "es": "criticar", "enPron": "kritisaiz", "pastPron": "kritisaizd"}, {"en": "cross", "past": "crossed", "es": "cruzar", "enPron": "kros", "pastPron": "krost"}, {"en": "crush", "past": "crushed", "es": "aplastar", "enPron": "krash", "pastPron": "krasht"}, {"en": "cry", "past": "cried", "es": "llorar", "enPron": "krai", "pastPron": "kraid"}, {"en": "cure", "past": "cured", "es": "curar", "enPron": "kiur", "pastPron": "kiurd"}, {"en": "curl", "past": "curled", "es": "rizar", "enPron": "kerl", "pastPron": "kerld"}, {"en": "curse", "past": "cursed", "es": "maldecir", "enPron": "kers", "pastPron": "kerst"}, {"en": "cut", "past": "cut", "es": "cortar", "enPron": "kat", "pastPron": "kat"}, {"en": "dam", "past": "dammed", "es": "represar", "enPron": "dam", "pastPron": "damd"}, {"en": "damage", "past": "damaged", "es": "dañar", "enPron": "damich", "pastPron": "damicht"}, {"en": "dance", "past": "danced", "es": "bailar", "enPron": "dans", "pastPron": "danst"}, {"en": "dare", "past": "dared", "es": "atreverse", "enPron": "deer", "pastPron": "deerd"}, {"en": "darken", "past": "darkened", "es": "oscurecer", "enPron": "darken", "pastPron": "darkend"}, {"en": "dazzle", "past": "dazzled", "es": "deslumbrar", "enPron": "dazl", "pastPron": "dazld"}, {"en": "deal", "past": "dealt", "es": "tratar / repartir", "enPron": "diil", "pastPron": "delt"}, {"en": "debate", "past": "debated", "es": "debatir", "enPron": "dibeit", "pastPron": "dibeitid"}, {"en": "decay", "past": "decayed", "es": "descomponerse", "enPron": "dikei", "pastPron": "dikeid"}, {"en": "deceive", "past": "deceived", "es": "engañar", "enPron": "disiiv", "pastPron": "disiivd"}, {"en": "decide", "past": "decided", "es": "decidir", "enPron": "disaid", "pastPron": "disaidid"}, {"en": "declare", "past": "declared", "es": "declarar", "enPron": "dikleer", "pastPron": "dikleerd"}, {"en": "decline", "past": "declined", "es": "declinar / rechazar", "enPron": "diklain", "pastPron": "diklaind"}, {"en": "decorate", "past": "decorated", "es": "decorar", "enPron": "dekoreit", "pastPron": "dekoreitid"}, {"en": "decrease", "past": "decreased", "es": "disminuir", "enPron": "dikriis", "pastPron": "dikriist"}, {"en": "dedicate", "past": "dedicated", "es": "dedicar", "enPron": "dediekeit", "pastPron": "dediekeitid"}, {"en": "defeat", "past": "defeated", "es": "derrotar", "enPron": "difiit", "pastPron": "difiitid"}, {"en": "defend", "past": "defended", "es": "defender", "enPron": "difend", "pastPron": "difendid"}, {"en": "define", "past": "defined", "es": "definir", "enPron": "difain", "pastPron": "difaind"}, {"en": "delay", "past": "delayed", "es": "retrasar", "enPron": "dilei", "pastPron": "dileid"}, {"en": "delight", "past": "delighted", "es": "deleitar", "enPron": "dilait", "pastPron": "dilaitid"}, {"en": "deliver", "past": "delivered", "es": "entregar", "enPron": "diliver", "pastPron": "diliverd"}, {"en": "demand", "past": "demanded", "es": "exigir", "enPron": "dimand", "pastPron": "dimandid"}, {"en": "demonstrate", "past": "demonstrated", "es": "demostrar", "enPron": "demonstreit", "pastPron": "demonstreitid"}, {"en": "deny", "past": "denied", "es": "negar", "enPron": "dinai", "pastPron": "dinaid"}, {"en": "depend", "past": "depended", "es": "depender", "enPron": "dipend", "pastPron": "dipendid"}, {"en": "depress", "past": "depressed", "es": "deprimir", "enPron": "dipres", "pastPron": "diprest"}, {"en": "derive", "past": "derived", "es": "derivar", "enPron": "diraiv", "pastPron": "diraivd"}, {"en": "descend", "past": "descended", "es": "descender", "enPron": "disend", "pastPron": "disendid"}, {"en": "describe", "past": "described", "es": "describir", "enPron": "diskraib", "pastPron": "diskraibd"}, {"en": "desert", "past": "deserted", "es": "abandonar", "enPron": "dezert", "pastPron": "dezertid"}, {"en": "deserve", "past": "deserved", "es": "merecer", "enPron": "dizerv", "pastPron": "dizervd"}, {"en": "design", "past": "designed", "es": "diseñar", "enPron": "disain", "pastPron": "disaind"}, {"en": "desire", "past": "desired", "es": "desear", "enPron": "dizaier", "pastPron": "dizaierd"}, {"en": "destroy", "past": "destroyed", "es": "destruir", "enPron": "destroi", "pastPron": "destroid"}, {"en": "detect", "past": "detected", "es": "detectar", "enPron": "ditekt", "pastPron": "ditektid"}, {"en": "determine", "past": "determined", "es": "determinar", "enPron": "ditermin", "pastPron": "ditermind"}, {"en": "develop", "past": "developed", "es": "desarrollar", "enPron": "divelop", "pastPron": "divelopt"}, {"en": "devote", "past": "devoted", "es": "dedicar", "enPron": "divout", "pastPron": "divoutid"}, {"en": "die", "past": "died", "es": "morir", "enPron": "dai", "pastPron": "daid"}, {"en": "differ", "past": "differed", "es": "diferir", "enPron": "difer", "pastPron": "diferd"}, {"en": "dig", "past": "dug", "es": "cavar", "enPron": "dig", "pastPron": "dag"}, {"en": "dilute", "past": "diluted", "es": "diluir", "enPron": "dailut", "pastPron": "dailutid"}, {"en": "dip", "past": "dipped", "es": "sumergir", "enPron": "dip", "pastPron": "dipt"}, {"en": "direct", "past": "directed", "es": "dirigir", "enPron": "direkt", "pastPron": "direktid"}, {"en": "disappear", "past": "disappeared", "es": "desaparecer", "enPron": "disapir", "pastPron": "disapird"}, {"en": "disappoint", "past": "disappointed", "es": "decepcionar", "enPron": "disapoint", "pastPron": "disapointid"}, {"en": "disapprove", "past": "disapproved", "es": "desaprobar", "enPron": "disapruv", "pastPron": "disapruvd"}, {"en": "disconnect", "past": "disconnected", "es": "desconectar", "enPron": "diskonekt", "pastPron": "diskonektid"}, {"en": "discover", "past": "discovered", "es": "descubrir", "enPron": "diskaver", "pastPron": "diskaverd"}, {"en": "discuss", "past": "discussed", "es": "discutir", "enPron": "diskas", "pastPron": "diskast"}, {"en": "dislike", "past": "disliked", "es": "que no le guste", "enPron": "dislaik", "pastPron": "dislaikt"}, {"en": "dismiss", "past": "dismissed", "es": "despedir / desestimar", "enPron": "dismis", "pastPron": "dismist"}, {"en": "disobey", "past": "disobeyed", "es": "desobedecer", "enPron": "disobei", "pastPron": "disobeid"}, {"en": "display", "past": "displayed", "es": "mostrar", "enPron": "displei", "pastPron": "displeid"}, {"en": "disturb", "past": "disturbed", "es": "perturbar", "enPron": "disterb", "pastPron": "disterbd"}, {"en": "dive", "past": "dived/dove", "es": "bucear / zambullirse", "enPron": "daiv", "pastPron": "daivd/daivd"}, {"en": "divide", "past": "divided", "es": "dividir", "enPron": "divaid", "pastPron": "divaidid"}, {"en": "do", "past": "did", "es": "hacer", "enPron": "du", "pastPron": "did"}, {"en": "dodge", "past": "dodged", "es": "esquivar", "enPron": "doch", "pastPron": "docht"}, {"en": "double", "past": "doubled", "es": "duplicar", "enPron": "dabl", "pastPron": "dabld"}, {"en": "doubt", "past": "doubted", "es": "dudar", "enPron": "daut", "pastPron": "dautid"}, {"en": "drag", "past": "dragged", "es": "arrastrar", "enPron": "drag", "pastPron": "dragd"}, {"en": "drain", "past": "drained", "es": "drenar", "enPron": "dreein", "pastPron": "dreeind"}, {"en": "draw", "past": "drew", "es": "dibujar", "enPron": "dro", "pastPron": "dru"}, {"en": "dream", "past": "dreamed/dreamt", "es": "soñar", "enPron": "driim", "pastPron": "driimd/driimd"}, {"en": "dress", "past": "dressed", "es": "vestir", "enPron": "dres", "pastPron": "drest"}, {"en": "drift", "past": "drifted", "es": "derivar / flotar", "enPron": "drift", "pastPron": "driftid"}, {"en": "drill", "past": "drilled", "es": "taladrar", "enPron": "dril", "pastPron": "drild"}, {"en": "drink", "past": "drank", "es": "beber", "enPron": "drink", "pastPron": "drank"}, {"en": "drive", "past": "drove", "es": "conducir", "enPron": "draiv", "pastPron": "drouv"}, {"en": "drop", "past": "dropped", "es": "dejar caer", "enPron": "drop", "pastPron": "dropt"}, {"en": "drown", "past": "drowned", "es": "ahogarse", "enPron": "draun", "pastPron": "draund"}, {"en": "dry", "past": "dried", "es": "secar", "enPron": "drai", "pastPron": "draid"}, {"en": "dust", "past": "dusted", "es": "desempolvar", "enPron": "dast", "pastPron": "dastid"}, {"en": "earn", "past": "earned", "es": "ganar (dinero)", "enPron": "ern", "pastPron": "ernd"}, {"en": "eat", "past": "ate", "es": "comer", "enPron": "iit", "pastPron": "eit"}, {"en": "edit", "past": "edited", "es": "editar", "enPron": "edit", "pastPron": "editid"}, {"en": "educate", "past": "educated", "es": "educar", "enPron": "ediukeit", "pastPron": "ediukeitid"}, {"en": "elect", "past": "elected", "es": "elegir (votar)", "enPron": "ilekt", "pastPron": "ilektid"}, {"en": "eliminate", "past": "eliminated", "es": "eliminar", "enPron": "iliminet", "pastPron": "iliminetid"}, {"en": "embarrass", "past": "embarrassed", "es": "avergonzar", "enPron": "embaras", "pastPron": "embarast"}, {"en": "embrace", "past": "embraced", "es": "abrazar", "enPron": "embreis", "pastPron": "embreist"}, {"en": "emerge", "past": "emerged", "es": "emerger", "enPron": "imerch", "pastPron": "imercht"}, {"en": "emphasize", "past": "emphasized", "es": "enfatizar", "enPron": "emfasaiz", "pastPron": "emfasaizd"}, {"en": "employ", "past": "employed", "es": "emplear", "enPron": "emploi", "pastPron": "emploid"}, {"en": "empty", "past": "emptied", "es": "vaciar", "enPron": "empti", "pastPron": "emptid"}, {"en": "encourage", "past": "encouraged", "es": "animar / alentar", "enPron": "enkarich", "pastPron": "enkaricht"}, {"en": "end", "past": "ended", "es": "terminar", "enPron": "end", "pastPron": "endid"}, {"en": "endanger", "past": "endangered", "es": "poner en peligro", "enPron": "endeinyer", "pastPron": "endeinyerd"}, {"en": "endure", "past": "endured", "es": "soportar", "enPron": "endiur", "pastPron": "endiurd"}, {"en": "engage", "past": "engaged", "es": "comprometerse", "enPron": "engueich", "pastPron": "engueicht"}, {"en": "enjoy", "past": "enjoyed", "es": "disfrutar", "enPron": "enyoi", "pastPron": "enyoid"}, {"en": "enlarge", "past": "enlarged", "es": "agrandar", "enPron": "enlarch", "pastPron": "enlarcht"}, {"en": "ensure", "past": "ensured", "es": "asegurar", "enPron": "enshur", "pastPron": "enshurd"}, {"en": "enter", "past": "entered", "es": "entrar", "enPron": "enter", "pastPron": "enterd"}, {"en": "entertain", "past": "entertained", "es": "entretener", "enPron": "entertein", "pastPron": "enterteind"}, {"en": "envy", "past": "envied", "es": "envidiar", "enPron": "envi", "pastPron": "envid"}, {"en": "equal", "past": "equaled", "es": "igualar", "enPron": "ikual", "pastPron": "ikuald"}, {"en": "equip", "past": "equipped", "es": "equipar", "enPron": "ekuip", "pastPron": "ekuipt"}, {"en": "erase", "past": "erased", "es": "borrar", "enPron": "ireis", "pastPron": "ireist"}, {"en": "escape", "past": "escaped", "es": "escapar", "enPron": "eskeip", "pastPron": "eskeipt"}, {"en": "estimate", "past": "estimated", "es": "estimar", "enPron": "estimeit", "pastPron": "estimeitid"}, {"en": "evaluate", "past": "evaluated", "es": "evaluar", "enPron": "ivaliueit", "pastPron": "ivaliueitid"}, {"en": "examine", "past": "examined", "es": "examinar", "enPron": "eksamin", "pastPron": "eksamind"}, {"en": "exceed", "past": "exceeded", "es": "exceder", "enPron": "eksiid", "pastPron": "eksiidid"}, {"en": "excite", "past": "excited", "es": "emocionar", "enPron": "eksait", "pastPron": "eksaitid"}, {"en": "exclaim", "past": "exclaimed", "es": "exclamar", "enPron": "eksklem", "pastPron": "eksklemd"}, {"en": "excuse", "past": "excused", "es": "disculpar", "enPron": "ekskius", "pastPron": "ekskiust"}, {"en": "execute", "past": "executed", "es": "ejecutar", "enPron": "eksekiut", "pastPron": "eksekiutid"}, {"en": "exercise", "past": "exercised", "es": "ejercitar", "enPron": "eksersaiz", "pastPron": "eksersaizd"}, {"en": "exhaust", "past": "exhausted", "es": "agotar", "enPron": "egzost", "pastPron": "egzostid"}, {"en": "exhibit", "past": "exhibited", "es": "exhibir", "enPron": "egzibit", "pastPron": "egzibitid"}, {"en": "exist", "past": "existed", "es": "existir", "enPron": "eksist", "pastPron": "eksistid"}, {"en": "exit", "past": "exited", "es": "salir", "enPron": "eksit", "pastPron": "eksitid"}, {"en": "expand", "past": "expanded", "es": "expandir", "enPron": "ekspand", "pastPron": "ekspandid"}, {"en": "expect", "past": "expected", "es": "esperar / anticipar", "enPron": "ekspekt", "pastPron": "ekspektid"}, {"en": "experience", "past": "experienced", "es": "experimentar", "enPron": "ekspirians", "pastPron": "ekspirianst"}, {"en": "experiment", "past": "experimented", "es": "experimentar (probar)", "enPron": "eksperiment", "pastPron": "eksperimentid"}, {"en": "explain", "past": "explained", "es": "explicar", "enPron": "ekspleein", "pastPron": "ekspleeind"}, {"en": "explore", "past": "explored", "es": "explorar", "enPron": "eksplor", "pastPron": "eksplord"}, {"en": "express", "past": "expressed", "es": "expresar", "enPron": "ekspres", "pastPron": "eksprest"}, {"en": "extend", "past": "extended", "es": "extender", "enPron": "ekstend", "pastPron": "ekstendid"}, {"en": "face", "past": "faced", "es": "enfrentar", "enPron": "feis", "pastPron": "feist"}, {"en": "fade", "past": "faded", "es": "desvanecerse", "enPron": "feid", "pastPron": "feidid"}, {"en": "fail", "past": "failed", "es": "fallar / fracasar", "enPron": "feil", "pastPron": "feild"}, {"en": "faint", "past": "fainted", "es": "desmayarse", "enPron": "feint", "pastPron": "feintid"}, {"en": "fake", "past": "faked", "es": "fingir", "enPron": "feik", "pastPron": "feikt"}, {"en": "fall", "past": "fell", "es": "caer", "enPron": "fol", "pastPron": "fel"}, {"en": "fasten", "past": "fastened", "es": "abrochar / atar", "enPron": "fasen", "pastPron": "fasend"}, {"en": "fear", "past": "feared", "es": "temer", "enPron": "fir", "pastPron": "fird"}, {"en": "feed", "past": "fed", "es": "alimentar", "enPron": "fid", "pastPron": "fidid"}, {"en": "feel", "past": "felt", "es": "sentir", "enPron": "fiil", "pastPron": "felt"}, {"en": "fetch", "past": "fetched", "es": "traer / ir a buscar", "enPron": "fech", "pastPron": "fecht"}, {"en": "fight", "past": "fought", "es": "pelear", "enPron": "fait", "pastPron": "fot"}, {"en": "file", "past": "filed", "es": "archivar", "enPron": "fail", "pastPron": "faild"}, {"en": "fill", "past": "filled", "es": "llenar", "enPron": "fil", "pastPron": "fild"}, {"en": "film", "past": "filmed", "es": "filmar", "enPron": "film", "pastPron": "filmd"}, {"en": "find", "past": "found", "es": "encontrar", "enPron": "faind", "pastPron": "faund"}, {"en": "finish", "past": "finished", "es": "terminar", "enPron": "finish", "pastPron": "finisht"}, {"en": "fire", "past": "fired", "es": "disparar / despedir", "enPron": "faier", "pastPron": "faierd"}, {"en": "fit", "past": "fit/fitted", "es": "quedar bien / encajar", "enPron": "fit", "pastPron": "fit/fitid"}, {"en": "fix", "past": "fixed", "es": "arreglar", "enPron": "fiks", "pastPron": "fikst"}, {"en": "flap", "past": "flapped", "es": "aletear", "enPron": "flap", "pastPron": "flapt"}, {"en": "flash", "past": "flashed", "es": "destellar", "enPron": "flash", "pastPron": "flasht"}, {"en": "flee", "past": "fled", "es": "huir", "enPron": "flii", "pastPron": "fled"}, {"en": "float", "past": "floated", "es": "flotar", "enPron": "flout", "pastPron": "floutid"}, {"en": "flood", "past": "flooded", "es": "inundar", "enPron": "flad", "pastPron": "fladid"}, {"en": "flow", "past": "flowed", "es": "fluir", "enPron": "flou", "pastPron": "floud"}, {"en": "fly", "past": "flew", "es": "volar", "enPron": "flai", "pastPron": "flu"}, {"en": "focus", "past": "focused", "es": "enfocarse", "enPron": "foukas", "pastPron": "foukast"}, {"en": "fold", "past": "folded", "es": "doblar", "enPron": "fould", "pastPron": "fouldid"}, {"en": "follow", "past": "followed", "es": "seguir", "enPron": "folou", "pastPron": "foloud"}, {"en": "fool", "past": "fooled", "es": "engañar", "enPron": "ful", "pastPron": "fuld"}, {"en": "forbid", "past": "forbade", "es": "prohibir", "enPron": "forbid", "pastPron": "forbeid"}, {"en": "force", "past": "forced", "es": "forzar", "enPron": "fors", "pastPron": "forst"}, {"en": "forget", "past": "forgot", "es": "olvidar", "enPron": "forguet", "pastPron": "forgot"}, {"en": "forgive", "past": "forgave", "es": "perdonar", "enPron": "forguiv", "pastPron": "forgueiv"}, {"en": "form", "past": "formed", "es": "formar", "enPron": "form", "pastPron": "formd"}, {"en": "found", "past": "founded", "es": "fundar", "enPron": "faund", "pastPron": "faundid"}, {"en": "freeze", "past": "froze", "es": "congelar", "enPron": "friiz", "pastPron": "frouz"}, {"en": "frighten", "past": "frightened", "es": "asustar", "enPron": "fraiten", "pastPron": "fraitend"}, {"en": "frown", "past": "frowned", "es": "fruncir el ceño", "enPron": "fraun", "pastPron": "fraund"}, {"en": "fry", "past": "fried", "es": "freír", "enPron": "frai", "pastPron": "fraid"}, {"en": "gain", "past": "gained", "es": "ganar (obtener)", "enPron": "guein", "pastPron": "gueind"}, {"en": "gather", "past": "gathered", "es": "reunir", "enPron": "gader", "pastPron": "gaderd"}, {"en": "gaze", "past": "gazed", "es": "mirar fijamente", "enPron": "gueiz", "pastPron": "gueizd"}, {"en": "get", "past": "got", "es": "conseguir / obtener", "enPron": "guet", "pastPron": "got"}, {"en": "give", "past": "gave", "es": "dar", "enPron": "guiv", "pastPron": "gueiv"}, {"en": "glance", "past": "glanced", "es": "echar un vistazo", "enPron": "glans", "pastPron": "glanst"}, {"en": "glow", "past": "glowed", "es": "brillar (resplandor)", "enPron": "glou", "pastPron": "gloud"}, {"en": "glue", "past": "glued", "es": "pegar (con pegamento)", "enPron": "glu", "pastPron": "glud"}, {"en": "go", "past": "went", "es": "ir", "enPron": "gou", "pastPron": "uent"}, {"en": "govern", "past": "governed", "es": "gobernar", "enPron": "gavern", "pastPron": "gavernd"}, {"en": "grab", "past": "grabbed", "es": "agarrar", "enPron": "grab", "pastPron": "grabd"}, {"en": "grant", "past": "granted", "es": "conceder", "enPron": "grant", "pastPron": "grantid"}, {"en": "grasp", "past": "grasped", "es": "agarrar / comprender", "enPron": "grasp", "pastPron": "graspt"}, {"en": "greet", "past": "greeted", "es": "saludar", "enPron": "griit", "pastPron": "griitid"}, {"en": "grind", "past": "ground", "es": "moler", "enPron": "graind", "pastPron": "graund"}, {"en": "groan", "past": "groaned", "es": "gemir", "enPron": "groun", "pastPron": "ground"}, {"en": "grow", "past": "grew", "es": "crecer", "enPron": "grou", "pastPron": "gru"}, {"en": "guard", "past": "guarded", "es": "guardar / proteger", "enPron": "gard", "pastPron": "gardid"}, {"en": "guess", "past": "guessed", "es": "adivinar", "enPron": "gues", "pastPron": "guest"}, {"en": "guide", "past": "guided", "es": "guiar", "enPron": "gaid", "pastPron": "gaidid"}, {"en": "hammer", "past": "hammered", "es": "martillar", "enPron": "jamer", "pastPron": "jamerd"}, {"en": "handle", "past": "handled", "es": "manejar", "enPron": "jandl", "pastPron": "jandld"}, {"en": "hang", "past": "hung", "es": "colgar", "enPron": "jang", "pastPron": "jang"}, {"en": "happen", "past": "happened", "es": "suceder", "enPron": "japen", "pastPron": "japend"}, {"en": "harm", "past": "harmed", "es": "dañar", "enPron": "jarm", "pastPron": "jarmd"}, {"en": "harvest", "past": "harvested", "es": "cosechar", "enPron": "jarvest", "pastPron": "jarvestid"}, {"en": "hate", "past": "hated", "es": "odiar", "enPron": "jeit", "pastPron": "jeitid"}, {"en": "have", "past": "had", "es": "tener", "enPron": "jav", "pastPron": "jad"}, {"en": "head", "past": "headed", "es": "dirigirse", "enPron": "jed", "pastPron": "jedid"}, {"en": "heal", "past": "healed", "es": "sanar", "enPron": "jiil", "pastPron": "jiild"}, {"en": "hear", "past": "heard", "es": "oír", "enPron": "jir", "pastPron": "jerd"}, {"en": "heat", "past": "heated", "es": "calentar", "enPron": "jiit", "pastPron": "jiitid"}, {"en": "help", "past": "helped", "es": "ayudar", "enPron": "jelp", "pastPron": "jelpt"}, {"en": "hesitate", "past": "hesitated", "es": "dudar / vacilar", "enPron": "jeziteit", "pastPron": "jeziteitid"}, {"en": "hide", "past": "hid", "es": "esconder", "enPron": "jaid", "pastPron": "jid"}, {"en": "hire", "past": "hired", "es": "contratar", "enPron": "jaier", "pastPron": "jaierd"}, {"en": "hit", "past": "hit", "es": "golpear", "enPron": "jit", "pastPron": "jit"}, {"en": "hold", "past": "held", "es": "sostener / sujetar", "enPron": "jould", "pastPron": "jeld"}, {"en": "honor", "past": "honored", "es": "honrar", "enPron": "oner", "pastPron": "onerd"}, {"en": "hook", "past": "hooked", "es": "enganchar", "enPron": "juk", "pastPron": "jukt"}, {"en": "hop", "past": "hopped", "es": "saltar (con un pie)", "enPron": "jop", "pastPron": "jopt"}, {"en": "hope", "past": "hoped", "es": "esperar (desear)", "enPron": "joup", "pastPron": "joupt"}, {"en": "host", "past": "hosted", "es": "presentar / albergar", "enPron": "joust", "pastPron": "joustid"}, {"en": "howl", "past": "howled", "es": "aullar", "enPron": "jaul", "pastPron": "jauld"}, {"en": "hug", "past": "hugged", "es": "abrazar", "enPron": "jag", "pastPron": "jagd"}, {"en": "hum", "past": "hummed", "es": "tararear", "enPron": "jam", "pastPron": "jamd"}, {"en": "hunt", "past": "hunted", "es": "cazar", "enPron": "jant", "pastPron": "jantid"}, {"en": "hurry", "past": "hurried", "es": "apresurarse", "enPron": "jari", "pastPron": "jarid"}, {"en": "hurt", "past": "hurt", "es": "lastimar", "enPron": "jert", "pastPron": "jert"}, {"en": "identify", "past": "identified", "es": "identificar", "enPron": "aidentifai", "pastPron": "aidentifaid"}, {"en": "ignore", "past": "ignored", "es": "ignorar", "enPron": "ignor", "pastPron": "ignord"}, {"en": "illustrate", "past": "illustrated", "es": "ilustrar", "enPron": "ilastreit", "pastPron": "ilastreitid"}, {"en": "imagine", "past": "imagined", "es": "imaginar", "enPron": "imayin", "pastPron": "imayind"}, {"en": "imitate", "past": "imitated", "es": "imitar", "enPron": "imiteit", "pastPron": "imiteitid"}, {"en": "impress", "past": "impressed", "es": "impresionar", "enPron": "impres", "pastPron": "imprest"}, {"en": "improve", "past": "improved", "es": "mejorar", "enPron": "impruuv", "pastPron": "impruuvd"}, {"en": "include", "past": "included", "es": "incluir", "enPron": "inkluud", "pastPron": "inkluuded"}, {"en": "increase", "past": "increased", "es": "aumentar", "enPron": "inkriis", "pastPron": "inkriist"}, {"en": "indicate", "past": "indicated", "es": "indicar", "enPron": "indikeit", "pastPron": "indikeitid"}, {"en": "inflate", "past": "inflated", "es": "inflar", "enPron": "infleit", "pastPron": "infleitid"}, {"en": "influence", "past": "influenced", "es": "influir", "enPron": "influens", "pastPron": "influenst"}, {"en": "inform", "past": "informed", "es": "informar", "enPron": "inform", "pastPron": "informd"}, {"en": "inject", "past": "injected", "es": "inyectar", "enPron": "inyekt", "pastPron": "inyektid"}, {"en": "injure", "past": "injured", "es": "lesionar", "enPron": "inyer", "pastPron": "inyerd"}, {"en": "insert", "past": "inserted", "es": "insertar", "enPron": "insert", "pastPron": "insertid"}, {"en": "insist", "past": "insisted", "es": "insistir", "enPron": "insist", "pastPron": "insistid"}, {"en": "inspect", "past": "inspected", "es": "inspeccionar", "enPron": "inspekt", "pastPron": "inspektid"}, {"en": "inspire", "past": "inspired", "es": "inspirar", "enPron": "inspaier", "pastPron": "inspaierd"}, {"en": "install", "past": "installed", "es": "instalar", "enPron": "instol", "pastPron": "instold"}, {"en": "instruct", "past": "instructed", "es": "instruir", "enPron": "instrakt", "pastPron": "instraktid"}, {"en": "insult", "past": "insulted", "es": "insultar", "enPron": "insalt", "pastPron": "insaltid"}, {"en": "insure", "past": "insured", "es": "asegurar (seguro)", "enPron": "inshur", "pastPron": "inshurd"}, {"en": "intend", "past": "intended", "es": "tener la intención", "enPron": "intend", "pastPron": "intendid"}, {"en": "interest", "past": "interested", "es": "interesar", "enPron": "interest", "pastPron": "interestid"}, {"en": "interfere", "past": "interfered", "es": "interferir", "enPron": "interfir", "pastPron": "interfird"}, {"en": "interpret", "past": "interpreted", "es": "interpretar", "enPron": "interpret", "pastPron": "interpretid"}, {"en": "interrupt", "past": "interrupted", "es": "interrumpir", "enPron": "interapt", "pastPron": "interaptid"}, {"en": "interview", "past": "interviewed", "es": "entrevistar", "enPron": "intervyu", "pastPron": "intervyud"}, {"en": "introduce", "past": "introduced", "es": "presentar (a alguien)", "enPron": "introdius", "pastPron": "introdiust"}, {"en": "invent", "past": "invented", "es": "inventar", "enPron": "invent", "pastPron": "inventid"}, {"en": "investigate", "past": "investigated", "es": "investigar", "enPron": "investigueit", "pastPron": "investigueitid"}, {"en": "invite", "past": "invited", "es": "invitar", "enPron": "invait", "pastPron": "invaitid"}, {"en": "iron", "past": "ironed", "es": "planchar", "enPron": "aiern", "pastPron": "aiernd"}, {"en": "irritate", "past": "irritated", "es": "irritar", "enPron": "iriteit", "pastPron": "iriteitid"}, {"en": "isolate", "past": "isolated", "es": "aislar", "enPron": "aisoleit", "pastPron": "aisoleitid"}, {"en": "itch", "past": "itched", "es": "picar (comezón)", "enPron": "ich", "pastPron": "icht"}, {"en": "jail", "past": "jailed", "es": "encarcelar", "enPron": "yeil", "pastPron": "yeild"}, {"en": "jog", "past": "jogged", "es": "trotar", "enPron": "yog", "pastPron": "yogd"}, {"en": "join", "past": "joined", "es": "unirse", "enPron": "yoin", "pastPron": "yoind"}, {"en": "joke", "past": "joked", "es": "bromear", "enPron": "youk", "pastPron": "youkt"}, {"en": "judge", "past": "judged", "es": "juzgar", "enPron": "yach", "pastPron": "yacht"}, {"en": "juggle", "past": "juggled", "es": "hacer malabares", "enPron": "yagl", "pastPron": "yagld"}, {"en": "jump", "past": "jumped", "es": "saltar", "enPron": "yamp", "pastPron": "yampt"}, {"en": "justify", "past": "justified", "es": "justificar", "enPron": "yastifai", "pastPron": "yastifaid"}, {"en": "keep", "past": "kept", "es": "mantener / guardar", "enPron": "kiip", "pastPron": "kept"}, {"en": "kick", "past": "kicked", "es": "patear", "enPron": "kik", "pastPron": "kikt"}, {"en": "kill", "past": "killed", "es": "matar", "enPron": "kil", "pastPron": "kild"}, {"en": "knit", "past": "knitted", "es": "tejer", "enPron": "nit", "pastPron": "nitid"}, {"en": "knock", "past": "knocked", "es": "tocar (puerta)", "enPron": "nok", "pastPron": "nokt"}, {"en": "know", "past": "knew", "es": "saber / conocer", "enPron": "nou", "pastPron": "niu"}, {"en": "label", "past": "labeled", "es": "etiquetar", "enPron": "leibol", "pastPron": "leibold"}, {"en": "lack", "past": "lacked", "es": "carecer", "enPron": "lak", "pastPron": "lakt"}, {"en": "land", "past": "landed", "es": "aterrizar", "enPron": "land", "pastPron": "landid"}, {"en": "last", "past": "lasted", "es": "durar", "enPron": "last", "pastPron": "lastid"}, {"en": "laugh", "past": "laughed", "es": "reír", "enPron": "laf", "pastPron": "laft"}, {"en": "launch", "past": "launched", "es": "lanzar", "enPron": "lonch", "pastPron": "loncht"}, {"en": "lay", "past": "laid", "es": "colocar / poner", "enPron": "lei", "pastPron": "leid"}, {"en": "lead", "past": "led", "es": "liderar / conducir", "enPron": "liid", "pastPron": "led"}, {"en": "lean", "past": "leaned/leant", "es": "inclinarse", "enPron": "liin", "pastPron": "liind/liind"}, {"en": "leap", "past": "leaped/leapt", "es": "saltar", "enPron": "liip", "pastPron": "liipt/liipt"}, {"en": "learn", "past": "learned/learnt", "es": "aprender", "enPron": "lern", "pastPron": "lernd/lernd"}, {"en": "leave", "past": "left", "es": "dejar / salir", "enPron": "liiv", "pastPron": "left"}, {"en": "lecture", "past": "lectured", "es": "dar una conferencia", "enPron": "lekcher", "pastPron": "lekcherd"}, {"en": "lend", "past": "lent", "es": "prestar", "enPron": "lend", "pastPron": "lent"}, {"en": "let", "past": "let", "es": "dejar / permitir", "enPron": "let", "pastPron": "let"}, {"en": "license", "past": "licensed", "es": "licenciar", "enPron": "laisens", "pastPron": "laisenst"}, {"en": "lick", "past": "licked", "es": "lamer", "enPron": "lik", "pastPron": "likt"}, {"en": "lie", "past": "lay/lied", "es": "mentir / recostarse", "enPron": "lai", "pastPron": "lei/laid"}, {"en": "lift", "past": "lifted", "es": "levantar", "enPron": "lift", "pastPron": "liftid"}, {"en": "light", "past": "lit", "es": "encender", "enPron": "lait", "pastPron": "lit"}, {"en": "like", "past": "liked", "es": "gustar", "enPron": "laik", "pastPron": "laikt"}, {"en": "limit", "past": "limited", "es": "limitar", "enPron": "limit", "pastPron": "limitid"}, {"en": "limp", "past": "limped", "es": "cojear", "enPron": "limp", "pastPron": "limpt"}, {"en": "line", "past": "lined", "es": "alinear", "enPron": "lain", "pastPron": "laind"}, {"en": "linger", "past": "lingered", "es": "persistir / quedarse", "enPron": "linguer", "pastPron": "linguerd"}, {"en": "list", "past": "listed", "es": "listar", "enPron": "list", "pastPron": "listid"}, {"en": "listen", "past": "listened", "es": "escuchar", "enPron": "lisen", "pastPron": "lisend"}, {"en": "live", "past": "lived", "es": "vivir", "enPron": "liv", "pastPron": "livd"}, {"en": "load", "past": "loaded", "es": "cargar", "enPron": "loud", "pastPron": "loudid"}, {"en": "locate", "past": "located", "es": "ubicar", "enPron": "loukeit", "pastPron": "loukeitid"}, {"en": "lock", "past": "locked", "es": "cerrar con llave", "enPron": "lok", "pastPron": "lokt"}, {"en": "long", "past": "longed", "es": "anhelar", "enPron": "long", "pastPron": "longd"}, {"en": "look", "past": "looked", "es": "mirar", "enPron": "luk", "pastPron": "lukt"}, {"en": "look after", "past": "looked after", "es": "cuidar de", "enPron": "luk after", "pastPron": "luk afterd"}, {"en": "loosen", "past": "loosened", "es": "aflojar", "enPron": "lusen", "pastPron": "lusend"}, {"en": "lose", "past": "lost", "es": "perder", "enPron": "luz", "pastPron": "lost"}, {"en": "love", "past": "loved", "es": "amar", "enPron": "lav", "pastPron": "lavd"}, {"en": "make", "past": "made", "es": "hacer / fabricar", "enPron": "meik", "pastPron": "meid"}, {"en": "manage", "past": "managed", "es": "administrar / lograr", "enPron": "manich", "pastPron": "manicht"}, {"en": "mark", "past": "marked", "es": "marcar", "enPron": "mark", "pastPron": "markt"}, {"en": "marry", "past": "married", "es": "casarse", "enPron": "mari", "pastPron": "marid"}, {"en": "match", "past": "matched", "es": "combinar / hacer juego", "enPron": "mach", "pastPron": "macht"}, {"en": "mean", "past": "meant", "es": "significar", "enPron": "miin", "pastPron": "ment"}, {"en": "measure", "past": "measured", "es": "medir", "enPron": "meshur", "pastPron": "meshurd"}, {"en": "meet", "past": "met", "es": "conocer / encontrarse", "enPron": "miit", "pastPron": "met"}, {"en": "melt", "past": "melted", "es": "derretir", "enPron": "melt", "pastPron": "meltid"}, {"en": "mention", "past": "mentioned", "es": "mencionar", "enPron": "menshon", "pastPron": "menshond"}, {"en": "mind", "past": "minded", "es": "importar / cuidar", "enPron": "maind", "pastPron": "maindid"}, {"en": "miss", "past": "missed", "es": "extrañar / perder", "enPron": "mis", "pastPron": "mist"}, {"en": "mix", "past": "mixed", "es": "mezclar", "enPron": "miks", "pastPron": "mikst"}, {"en": "move", "past": "moved", "es": "mover / mudarse", "enPron": "muv", "pastPron": "muvd"}, {"en": "need", "past": "needed", "es": "necesitar", "enPron": "nid", "pastPron": "nidid"}, {"en": "notice", "past": "noticed", "es": "notar", "enPron": "noutis", "pastPron": "noutist"}, {"en": "obey", "past": "obeyed", "es": "obedecer", "enPron": "obei", "pastPron": "obeid"}, {"en": "obtain", "past": "obtained", "es": "obtener", "enPron": "obteein", "pastPron": "obteeind"}, {"en": "occur", "past": "occurred", "es": "ocurrir", "enPron": "okur", "pastPron": "okurd"}, {"en": "offer", "past": "offered", "es": "ofrecer", "enPron": "ofer", "pastPron": "oferd"}, {"en": "open", "past": "opened", "es": "abrir", "enPron": "oupen", "pastPron": "oupend"}, {"en": "order", "past": "ordered", "es": "ordenar / pedir", "enPron": "order", "pastPron": "orderd"}, {"en": "organize", "past": "organized", "es": "organizar", "enPron": "organaiz", "pastPron": "organaizd"}, {"en": "own", "past": "owned", "es": "poseer", "enPron": "oun", "pastPron": "ound"}, {"en": "pack", "past": "packed", "es": "empacar", "enPron": "pak", "pastPron": "pakt"}, {"en": "paint", "past": "painted", "es": "pintar", "enPron": "peint", "pastPron": "peintid"}, {"en": "park", "past": "parked", "es": "estacionar", "enPron": "park", "pastPron": "parkt"}, {"en": "pass", "past": "passed", "es": "pasar", "enPron": "pas", "pastPron": "past"}, {"en": "pay", "past": "paid", "es": "pagar", "enPron": "pei", "pastPron": "peid"}, {"en": "permit", "past": "permitted", "es": "permitir", "enPron": "permit", "pastPron": "permitid"}, {"en": "pick", "past": "picked", "es": "recoger / elegir", "enPron": "pik", "pastPron": "pikt"}, {"en": "plan", "past": "planned", "es": "planear", "enPron": "plan", "pastPron": "pland"}, {"en": "plant", "past": "planted", "es": "plantar", "enPron": "plant", "pastPron": "plantid"}, {"en": "play", "past": "played", "es": "jugar", "enPron": "plei", "pastPron": "pleid"}, {"en": "point", "past": "pointed", "es": "señalar", "enPron": "point", "pastPron": "pointid"}, {"en": "pour", "past": "poured", "es": "verter", "enPron": "por", "pastPron": "pord"}, {"en": "practice", "past": "practiced", "es": "practicar", "enPron": "praktis", "pastPron": "praktist"}, {"en": "prefer", "past": "preferred", "es": "preferir", "enPron": "prifer", "pastPron": "priferd"}, {"en": "prepare", "past": "prepared", "es": "preparar", "enPron": "pripeer", "pastPron": "pripeerd"}, {"en": "present", "past": "presented", "es": "presentar", "enPron": "prizent", "pastPron": "prizentid"}]</script>
+<script>
+const VERBS = JSON.parse(document.getElementById('verbs-data').textContent);
+
+/* ---------- utilities ---------- */
+function stripAccents(s){
+  return s.normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+}
+function norm(s){
+  return stripAccents(String(s).toLowerCase()).replace(/[^a-z0-9\s]/g,'').trim().replace(/\s+/g,' ');
+}
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+function pickVerb(){ return pick(VERBS); }
+
+let score = {correct:0, total:0};
+function bumpScore(isCorrect){
+  score.total++;
+  if(isCorrect) score.correct++;
+  document.getElementById('scoreCorrect').textContent = score.correct;
+  document.getElementById('scoreTotal').textContent = score.total;
+}
+
+/* Parse a spanish meaning string into acceptable answers.
+   Handles "a / b", "a (nota)" etc. */
+function acceptableSpanish(es){
+  let base = es.replace(/\([^)]*\)/g,'').trim(); // drop parenthetical notes
+  let parts = base.split('/').map(p=>norm(p)).filter(Boolean);
+  // also allow the version WITH the parenthetical content stripped down to words
+  return parts;
+}
+function checkSpanishAnswer(userInput, es){
+  const u = norm(userInput);
+  if(!u) return false;
+  const accepted = acceptableSpanish(es);
+  for(const a of accepted){
+    if(u === a) return true;
+    // allow if user's answer is one of the significant words in a multi-word accepted phrase
+    if(a.split(' ').length > 1 && a.includes(u) && u.length >= 3) return true;
+  }
+  return false;
+}
+function checkEnglishAnswer(userInput, en, past){
+  const u = norm(userInput);
+  if(!u) return false;
+  if(u === norm(en)) return true;
+  const pastAlts = String(past).split('/').map(norm);
+  return pastAlts.includes(u);
+}
+
+/* ---------- Enter-key wiring helper ---------- */
+function wireEnter(inputId, btnId){
+  document.getElementById(inputId).addEventListener('keydown', e=>{
+    if(e.key === 'Enter'){ e.preventDefault(); document.getElementById(btnId).click(); }
+  });
+}
+
+/* ================= EN -> ES ================= */
+let currentEn2Es = null;
+function newEn2Es(){
+  currentEn2Es = pickVerb();
+  document.getElementById('en2es-word').textContent = currentEn2Es.en;
+  document.getElementById('en2es-pron').textContent = '/ ' + currentEn2Es.enPron + ' /';
+  document.getElementById('en2es-input').value = '';
+  document.getElementById('en2es-feedback').className = 'feedback';
+  document.getElementById('en2es-input').focus();
+}
+document.getElementById('en2es-check').addEventListener('click', ()=>{
+  const val = document.getElementById('en2es-input').value;
+  const ok = checkSpanishAnswer(val, currentEn2Es.es);
+  const fb = document.getElementById('en2es-feedback');
+  fb.className = 'feedback show ' + (ok?'correct':'wrong');
+  fb.innerHTML = ok
+    ? `<span>✔</span> <span><b>¡Correcto!</b> ${currentEn2Es.en} = ${currentEn2Es.es}</span>`
+    : `<span>✘</span> <span><b>Casi.</b> La respuesta era: <b>${currentEn2Es.es}</b></span>`;
+  bumpScore(ok);
+});
+document.getElementById('en2es-next').addEventListener('click', newEn2Es);
+wireEnter('en2es-input','en2es-check');
+
+/* ================= ES -> EN ================= */
+let currentEs2En = null;
+function newEs2En(){
+  currentEs2En = pickVerb();
+  document.getElementById('es2en-word').textContent = currentEs2En.es;
+  document.getElementById('es2en-input').value = '';
+  document.getElementById('es2en-feedback').className = 'feedback';
+  document.getElementById('es2en-input').focus();
+}
+document.getElementById('es2en-check').addEventListener('click', ()=>{
+  const val = document.getElementById('es2en-input').value;
+  const ok = checkEnglishAnswer(val, currentEs2En.en, currentEs2En.en);
+  const fb = document.getElementById('es2en-feedback');
+  fb.className = 'feedback show ' + (ok?'correct':'wrong');
+  fb.innerHTML = ok
+    ? `<span>✔</span> <span><b>¡Correcto!</b> ${currentEs2En.es} = ${currentEs2En.en}</span>`
+    : `<span>✘</span> <span><b>Casi.</b> La respuesta era: <b>${currentEs2En.en}</b></span>`;
+  bumpScore(ok);
+});
+document.getElementById('es2en-next').addEventListener('click', newEs2En);
+wireEnter('es2en-input','es2en-check');
+
+/* ================= MIX ================= */
+let currentMix = null;
+function newMix(){
+  currentMix = pickVerb();
+  currentMix.dir = Math.random() < 0.5 ? 'en2es' : 'es2en';
+  const label = document.getElementById('mix-label');
+  const word = document.getElementById('mix-word');
+  const pron = document.getElementById('mix-pron');
+  const input = document.getElementById('mix-input');
+  input.value = '';
+  document.getElementById('mix-feedback').className = 'feedback';
+  if(currentMix.dir === 'en2es'){
+    label.textContent = '¿Qué significa...?';
+    word.textContent = currentMix.en;
+    pron.textContent = '/ ' + currentMix.enPron + ' /';
+    input.placeholder = 'Escribe el significado en español';
+  } else {
+    label.textContent = '¿Cómo se dice...?';
+    word.textContent = currentMix.es;
+    pron.textContent = '';
+    input.placeholder = 'Write the verb in English';
+  }
+  input.focus();
+}
+document.getElementById('mix-check').addEventListener('click', ()=>{
+  const val = document.getElementById('mix-input').value;
+  let ok, answerShown;
+  if(currentMix.dir === 'en2es'){
+    ok = checkSpanishAnswer(val, currentMix.es);
+    answerShown = currentMix.es;
+  } else {
+    ok = checkEnglishAnswer(val, currentMix.en, currentMix.en);
+    answerShown = currentMix.en;
+  }
+  const fb = document.getElementById('mix-feedback');
+  fb.className = 'feedback show ' + (ok?'correct':'wrong');
+  fb.innerHTML = ok
+    ? `<span>✔</span> <span><b>¡Correcto!</b></span>`
+    : `<span>✘</span> <span><b>Casi.</b> La respuesta era: <b>${answerShown}</b></span>`;
+  bumpScore(ok);
+});
+document.getElementById('mix-next').addEventListener('click', newMix);
+wireEnter('mix-input','mix-check');
+
+/* ================= SENTENCE GENERATOR ================= */
+const SUBJECTS_S = ["I","You","We","They","The students","My friends","Many people","The workers","Some tourists","The children","My parents","The players","Our neighbors","The scientists","Most people","The visitors"];
+const SUBJECTS_ANY = SUBJECTS_S.concat(["He","She","The teacher","My brother","The manager","Her sister","The old man","A young girl","The company","The government","My grandmother","The team","His boss","The pilot","The doctor","The soldiers"]);
+
+const TIME_PRESENT = ["every day","every morning","usually","often","these days","on weekends","every year","from time to time","every summer","at work","in class","during meetings","at home","almost every night","before breakfast"];
+const TIME_PAST = ["yesterday","last night","last week","last year","this morning","a few minutes ago","two days ago","last summer","earlier today","before the meeting","when I arrived","during the trip","right after lunch","just before dawn","that same afternoon"];
+const PLACES = ["at the office","in the park","at school","in the kitchen","at the airport","in the city","at the beach","in the classroom","at the market","in the garden","at the hospital","in the mountains","by the river","at the station","in the old library"];
+const PEOPLE = ["her best friend","his colleagues","the new manager","an old classmate","the whole family","a stranger","the neighbors","his cousin","her assistant","the entire team","the local reporters","his oldest friend"];
+const REASONS = ["it was getting late","the weather was bad","they had no other choice","everyone was watching","the deadline was close","nobody else could help","it seemed important at the time","things had changed suddenly","the situation demanded it","there was no time to lose","the plan had already failed once","the whole city was talking about it"];
+const CLAUSES = ["Although the meeting had already started","Even though nobody expected it","While the rain kept falling outside","Because the situation had become urgent","Since the deadline was approaching fast","After several hours of waiting","Before anyone could say a word","Despite all the warnings they had received","As soon as the news spread","Once the decision had been made","Long before the sun came up","Right after the storm had passed"];
+const COMPLEMENTS = ["it without hesitation","the whole thing calmly","everything they could","it in front of everyone","the matter carefully","it more than once","everything right on time","it, just like before","the situation quickly","it with great care","the entire plan from scratch","it against everyone's advice"];
+
+function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
+function lower1(s){ return s.charAt(0).toLowerCase() + s.slice(1); }
+
+function buildSentence(diff){
+  const verb = pickVerb();
+  let tense, subj, text, answer;
+
+  if(diff === 'basico'){
+    tense = 'present';
+    subj = pick(SUBJECTS_S);
+    const t = pick(TIME_PRESENT);
+    const templates = [
+      `${subj} ___ ${t}.`,
+      `${subj} ___ ${pick(PLACES)}.`,
+      `${subj} always ___ ${t}.`,
+      `${subj} never ___ ${t}.`,
+      `${subj} ___ a lot.`,
+    ];
+    text = pick(templates);
+    answer = verb.en;
+  } else if(diff === 'facil'){
+    tense = 'past';
+    subj = pick(SUBJECTS_ANY);
+    const t = pick(TIME_PAST);
+    const templates = [
+      `${subj} ___ ${t}, ${pick(PLACES)}.`,
+      `${subj} ___ ${t} because ${pick(REASONS)}.`,
+      `Every day that week, ${lower1(subj)} ___ ${pick(PLACES)} before lunch.`,
+      `${subj} ___ ${t} with ${pick(PEOPLE)}.`,
+    ];
+    text = pick(templates);
+    answer = verb.past;
+  } else if(diff === 'dificil'){
+    tense = 'past';
+    subj = pick(SUBJECTS_ANY);
+    const t = pick(TIME_PAST);
+    const templates = [
+      `${pick(CLAUSES)}, ${lower1(subj)} ___ ${pick(COMPLEMENTS)}.`,
+      `${subj} ___ ${t}, but ${pick(PEOPLE)} didn't seem to notice.`,
+      `${pick(CLAUSES)}, ${lower1(subj)} quietly ___ ${pick(COMPLEMENTS)}, ${pick(PLACES)}.`,
+      `Even though ${pick(REASONS)}, ${lower1(subj)} ___ ${pick(COMPLEMENTS)} ${t}.`,
+    ];
+    text = pick(templates);
+    answer = verb.past;
+  } else { // epico
+    tense = 'past';
+    subj = pick(SUBJECTS_ANY);
+    const t = pick(TIME_PAST);
+    const templates = [
+      `${pick(CLAUSES)}, and although ${pick(REASONS)}, ${lower1(subj)} finally ___ ${pick(COMPLEMENTS)}, which surprised everyone ${pick(PLACES)}.`,
+      `${pick(CLAUSES)}, ${lower1(subj)} ___ ${pick(COMPLEMENTS)} ${t}, and from that moment on, ${pick(PEOPLE)} never forgot what had happened.`,
+      `After ${lower1(pick(CLAUSES))}, ${lower1(subj)} bravely ___ ${pick(COMPLEMENTS)}, even though ${pick(REASONS)}, and ${pick(PEOPLE)} still talk about it to this day.`,
+      `No one could explain why, but ${t}, ${lower1(subj)} suddenly ___ ${pick(COMPLEMENTS)}, and ${pick(PEOPLE)}, who had seen everything, said it changed things forever.`,
+    ];
+    text = pick(templates);
+    answer = verb.past;
+  }
+  text = cap(text);
+  return {text, answer, verb, tense};
+}
+
+let currentSentence = null;
+let currentDiff = 'basico';
+
+function renderSentence(){
+  const s = buildSentence(currentDiff);
+  currentSentence = s;
+  const blank = `<span class="blank-visual">&nbsp;</span>`;
+  document.getElementById('sentence-box').innerHTML = s.text.replace('___', blank);
+  document.getElementById('sentence-hint').textContent =
+    s.tense === 'present'
+      ? 'Pista: usa el verbo en presente (forma base), tal como aparece en la lista de 500 verbos.'
+      : 'Pista: usa el verbo en pasado simple.';
+  document.getElementById('sentence-input').value = '';
+  document.getElementById('sentence-feedback').className = 'feedback';
+  document.getElementById('sentence-input').focus();
+}
+
+document.querySelectorAll('.diff-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.diff-btn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    currentDiff = btn.dataset.diff;
+    renderSentence();
+  });
+});
+
+document.getElementById('sentence-check').addEventListener('click', ()=>{
+  const val = document.getElementById('sentence-input').value;
+  const u = norm(val);
+  const accepted = String(currentSentence.answer).split('/').map(norm);
+  const ok = accepted.includes(u);
+  const fb = document.getElementById('sentence-feedback');
+  fb.className = 'feedback show ' + (ok?'correct':'wrong');
+  const fullSentence = currentSentence.text.replace('___', currentSentence.answer.split('/')[0]);
+  fb.innerHTML = ok
+    ? `<span>✔</span> <span><b>¡Correcto!</b> ${fullSentence}</span>`
+    : `<span>✘</span> <span><b>Casi.</b> Era: <b>${currentSentence.answer.split('/')[0]}</b> — ${fullSentence}</span>`;
+  bumpScore(ok);
+});
+document.getElementById('sentence-next').addEventListener('click', renderSentence);
+wireEnter('sentence-input','sentence-check');
+
+/* ================= TAB NAVIGATION ================= */
+document.querySelectorAll('nav.tabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('nav.tabs button').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-' + btn.dataset.panel).classList.add('active');
+  });
+});
+
+/* ================= DARK MODE ================= */
+const themeToggle = document.getElementById('themeToggle');
+const themeIcon = document.getElementById('themeIcon');
+const themeLabel = document.getElementById('themeLabel');
+
+function applyTheme(theme){
+  if(theme === 'dark'){
+    document.documentElement.setAttribute('data-theme','dark');
+    themeIcon.textContent = '☀️';
+    themeLabel.textContent = 'Modo claro';
+    themeToggle.setAttribute('aria-pressed','true');
+  } else {
+    document.documentElement.removeAttribute('data-theme');
+    themeIcon.textContent = '🌙';
+    themeLabel.textContent = 'Modo oscuro';
+    themeToggle.setAttribute('aria-pressed','false');
+  }
+}
+
+async function initTheme(){
+  let theme = 'light';
+  try{
+    const stored = await window.storage.get('theme', false);
+    if(stored && stored.value){ theme = stored.value; }
+  }catch(e){
+    // no stored preference yet, or storage unavailable — fall back to system preference
+    if(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches){
+      theme = 'dark';
+    }
+  }
+  applyTheme(theme);
+}
+
+themeToggle.addEventListener('click', async ()=>{
+  const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+  const next = isDark ? 'light' : 'dark';
+  applyTheme(next);
+  try{
+    await window.storage.set('theme', next, false);
+  }catch(e){ /* ignore if storage isn't available */ }
+});
+
+initTheme();
+
+/* ================= INIT ================= */
+newEn2Es();
+newEs2En();
+newMix();
+renderSentence();
+</script>
+</body>
+</html>
